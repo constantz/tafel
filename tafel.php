@@ -76,13 +76,16 @@
             $model = $_POST["model"];
             $hout = $_POST["houtSoort"];
             $aantal = $_POST["aantal"];
+            $kortingsCode = $_POST["kortingsCode"]; // voor eventuele couponkorting
             $basisPrijs = 0;    // init basisprijs
             $teBetalen = 0;
             $houtFactor = 0;
             $modelFactor = 0;
             $aantalFactor = 1; // kortingsfactor bij hogere aantallen
             $aantalGrens = 0; // variable voor gebruik in uitvoer
+            $couponFactor = 1; // voor als er kortingscodes worden gebruikt
             $modelOmschrijving = "";
+            
 
             if ($aantal >= 25){
                 $aantalFactor = 0.85;
@@ -97,6 +100,14 @@
                 $aantalGrens = 3;
             }
                     
+            if ($kortingsCode != null) {
+                if (($kortingsCode == 123) || ($kortingsCode == 132) || ($kortingsCode == 213) || ($kortingsCode == 231) ||
+                    ($kortingsCode == 312) || ($kortingsCode == 321))
+                        {$couponFactor = 0.9;}
+                elseif (($kortingsCode == 1234) || ($kortingsCode == 4321))
+                        {$couponFactor = 0.8;}
+                
+            }
 
             switch($model) {
                 case 'klassiek': $modelOmschrijving = "Klassiek"; break;
@@ -133,8 +144,12 @@
                     echo "Nieuwe basisprijs: " . $basisPrijs * $aantalFactor . "<br><br>";
                 }
 
-                echo "Te betalen: " . $aantal . " x " . $basisPrijs * $aantalFactor . " =  <b>" . $teBetalen . "</b>";
-                
+                if ($couponFactor != 1){
+                    echo "Kortingscode \"" . $kortingsCode . "\" ingevoerd voor een extra korting van " . (100 * (1 - $couponFactor)) ."%
+                    op het eindbedrag <br><br>";
+                    echo "Te betalen: " . 100*$couponFactor . "% x " . $aantal . " x " . $basisPrijs * $aantalFactor . " =  <b>" . $teBetalen * $couponFactor . "</b></br>";
+                }
+                else echo "Te betalen: " . $aantal . " x " . $basisPrijs * $aantalFactor . " =  <b>" . $teBetalen . "</b></br>";
             }    
 
         }    
